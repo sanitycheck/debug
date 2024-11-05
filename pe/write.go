@@ -118,7 +118,7 @@ func (peFile *File) Bytes() ([]byte, error) {
 			bytesWritten += uint64(len(pad))
 		}
 		// if our shellcode insertion address is inside this section, insert it at the correct offset in sectionData
-		if peFile.InsertionAddr >= section.Offset && int64(peFile.InsertionAddr) < (int64(section.Offset)+int64(section.Size)-int64(len(peFile.InsertionBytes))) {
+		if peFile.InsertionAddr >= section.Offset && int64(peFile.InsertionAddr) <= (int64(section.Offset)+int64(section.Size)-int64(len(peFile.InsertionBytes))) {
 			sectionData = append(sectionData, peFile.InsertionBytes[:]...)
 			datalen := len(sectionData)
 			if sectionHeader.SizeOfRawData > uint32(datalen) {
