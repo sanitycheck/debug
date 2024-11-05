@@ -60,10 +60,15 @@ func (sym *COFFSymbol) FullName(st StringTable) (string, error) {
 }
 
 func removeAuxSymbols(allsyms []COFFSymbol, st StringTable) ([]*Symbol, error) {
+	syms := make([]*Symbol, 0)
+	stEntry, _ := st.String(0)
+	if stEntry == "" {
+		return syms, nil
+	}
 	if len(allsyms) == 0 {
 		return nil, nil
 	}
-	syms := make([]*Symbol, 0)
+
 	aux := uint8(0)
 	for _, sym := range allsyms {
 		if aux > 0 {
