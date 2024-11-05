@@ -36,7 +36,7 @@ func readCOFFSymbols(fh *FileHeader, r io.ReadSeeker) ([]COFFSymbol, error) {
 	syms := make([]COFFSymbol, fh.NumberOfSymbols)
 	err = binary.Read(r, binary.LittleEndian, syms)
 	if err != nil {
-		return nil, fmt.Errorf("fail to read symbol table: %v", err)
+		return syms, nil
 	}
 	return syms, nil
 }
