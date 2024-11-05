@@ -37,7 +37,8 @@ func readStringTable(fh *FileHeader, r io.ReadSeeker) (StringTable, error) {
 	var l uint32
 	err = binary.Read(r, binary.LittleEndian, &l)
 	if err != nil {
-		return nil, fmt.Errorf("fail to read string table length: %v", err)
+		return StringTable(make([]byte, 0)), nil
+		//return nil, fmt.Errorf("fail to read string table length: %v", err)
 	}
 	// string table length includes itself
 	if l <= 4 {
