@@ -134,8 +134,10 @@ func (peFile *File) Bytes() ([]byte, error) {
 	}
 
 	// write symbols
-	binary.Write(peBuf, binary.LittleEndian, peFile.COFFSymbols)
-	bytesWritten += uint64(binary.Size(peFile.COFFSymbols))
+	if len(peFile.COFFSymbols) > 0 && peFile.COFFSymbols[0].Value != 0 {
+		binary.Write(peBuf, binary.LittleEndian, peFile.COFFSymbols)
+		bytesWritten += uint64(binary.Size(peFile.COFFSymbols))
+	}
 
 	// write the string table
 	binary.Write(peBuf, binary.LittleEndian, peFile.StringTable)
