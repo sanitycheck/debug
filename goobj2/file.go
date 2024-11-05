@@ -22,8 +22,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Binject/debug/goobj2/internal/goobj2"
-	"github.com/Binject/debug/goobj2/internal/objabi"
+	"github.com/sanitycheck/debug/goobj2/internal/goobj2"
+	"github.com/sanitycheck/debug/goobj2/internal/objabi"
 )
 
 const (

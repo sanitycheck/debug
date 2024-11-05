@@ -14,8 +14,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Binject/debug/goobj2/internal/bio"
-	"github.com/Binject/debug/goobj2/internal/goobj2"
+	"github.com/sanitycheck/debug/goobj2/internal/bio"
+	"github.com/sanitycheck/debug/goobj2/internal/goobj2"
 )
 
 // Write writes the contents of the parsed archive to disk.
