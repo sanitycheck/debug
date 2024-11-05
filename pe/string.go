@@ -47,7 +47,8 @@ func readStringTable(fh *FileHeader, r io.ReadSeeker) (StringTable, error) {
 	buf := make([]byte, l)
 	_, err = io.ReadFull(r, buf)
 	if err != nil {
-		return nil, fmt.Errorf("fail to read string table: %v", err)
+		return StringTable(make([]byte, 0)), nil
+		//return nil, fmt.Errorf("fail to read string table: %v", err)
 	}
 	// re-add the length to the first four bytes of the string table
 	lbuf := make([]byte, 4)
