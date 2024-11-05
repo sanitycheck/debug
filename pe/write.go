@@ -26,7 +26,7 @@ func (peFile *File) Bytes() ([]byte, error) {
 	}
 
 	// apply padding before PE header if necessary
-	if uint32(bytesWritten) != peFile.DosHeader.AddressOfNewExeHeader {
+	if uint32(bytesWritten) <= peFile.DosHeader.AddressOfNewExeHeader {
 		padding := make([]byte, peFile.DosHeader.AddressOfNewExeHeader-uint32(bytesWritten))
 		binary.Write(peBuf, binary.LittleEndian, padding)
 		bytesWritten += uint64(len(padding))
