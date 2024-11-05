@@ -63,7 +63,8 @@ func readStringTable(fh *FileHeader, r io.ReadSeeker) (StringTable, error) {
 func (st StringTable) String(start uint32) (string, error) {
 	// start includes 4 bytes of string table length
 	if start < 4 {
-		return "", fmt.Errorf("offset %d is before the start of string table", start)
+		return "", nil
+		//return "", fmt.Errorf("offset %d is before the start of string table", start)
 	}
 	//start -= 4  // we are now including the uint32 length in the StringTable buffer as a prefix, this might change
 	if int(start) > len(st) {
