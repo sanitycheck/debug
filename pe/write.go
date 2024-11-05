@@ -46,20 +46,26 @@ func (peFile *File) Bytes() ([]byte, error) {
 	switch peFile.FileHeader.Machine {
 	case IMAGE_FILE_MACHINE_I386:
 		is32bit = true
-		optionalHeader := peFile.OptionalHeader.(*OptionalHeader32)
-		binary.Write(peBuf, binary.LittleEndian, peFile.OptionalHeader.(*OptionalHeader32))
-		bytesWritten += uint64(binary.Size(optionalHeader))
+		if peFile.OptionalHeader != nil {
+			optionalHeader := peFile.OptionalHeader.(*OptionalHeader32)
+			binary.Write(peBuf, binary.LittleEndian, peFile.OptionalHeader.(*OptionalHeader32))
+			bytesWritten += uint64(binary.Size(optionalHeader))
 
-		oldCertTableOffset = optionalHeader.DataDirectory[CERTIFICATE_TABLE].VirtualAddress
-		oldCertTableSize = optionalHeader.DataDirectory[CERTIFICATE_TABLE].Size
+			oldCertTableOffset = optionalHeader.DataDirectory[CERTIFICATE_TABLE].VirtualAddress
+			oldCertTableSize = optionalHeader.DataDirectory[CERTIFICATE_TABLE].Size
+		}
+
 	case IMAGE_FILE_MACHINE_AMD64:
 		is32bit = false
-		optionalHeader := peFile.OptionalHeader.(*OptionalHeader64)
-		binary.Write(peBuf, binary.LittleEndian, optionalHeader)
-		bytesWritten += uint64(binary.Size(optionalHeader))
+		if peFile.OptionalHeader != nil {
+			optionalHeader := peFile.OptionalHeader.(*OptionalHeader64)
+			binary.Write(peBuf, binary.LittleEndian, optionalHeader)
+			bytesWritten += uint64(binary.Size(optionalHeader))
 
-		oldCertTableOffset = optionalHeader.DataDirectory[CERTIFICATE_TABLE].VirtualAddress
-		oldCertTableSize = optionalHeader.DataDirectory[CERTIFICATE_TABLE].Size
+			oldCertTableOffset = optionalHeader.DataDirectory[CERTIFICATE_TABLE].VirtualAddress
+			oldCertTableSize = optionalHeader.DataDirectory[CERTIFICATE_TABLE].Size
+		}
+
 	default:
 		return nil, errors.New("architecture not supported")
 	}
