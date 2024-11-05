@@ -207,6 +207,14 @@ func newFileInternal(r io.ReaderAt, memoryMode bool) (*File, error) {
 			return nil, fmt.Errorf("pe32+ optional header has unexpected Magic of 0x%x", oh64.Magic)
 		}
 		f.OptionalHeader = &oh64
+	default:
+		if err := binary.Read(sr, binary.LittleEndian, &oh32); err != nil {
+			return nil, err
+		}
+		if oh32.Magic != 0x10b { // PE32
+			return nil, fmt.Errorf("pe32 optional header has unexpected Magic of 0x%x", oh32.Magic)
+		}
+		f.OptionalHeader = &oh32
 	}
 
 	// Process sections.
