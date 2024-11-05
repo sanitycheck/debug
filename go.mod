@@ -1,3 +1,3 @@
-module github.com/Binject/debug
+module github.com/sanitycheck/debug
 
 go 1.15
