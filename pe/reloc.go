@@ -56,7 +56,9 @@ const (
 
 // readBaseRelocationTable - reads the base relocation table from the file and stores it
 func (f *File) readBaseRelocationTable() (*[]RelocationTableEntry, error) {
-
+	if f.SizeOfOptionalHeader < 224 {
+		return nil, nil
+	}
 	if f.OptionalHeader == nil { // Optional header is optional, might not exist
 		return nil, nil
 	}
