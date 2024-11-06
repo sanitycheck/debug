@@ -32,6 +32,9 @@ func (machoFile *File) Bytes() ([]byte, error) {
 
 	// Write Load Commands Loop
 	for _, singleLoad := range machoFile.Loads {
+		if singleLoad == nil {
+			continue
+		}
 		buf2 := &bytes.Buffer{}
 		err = binary.Write(buf2, machoFile.ByteOrder, singleLoad.Raw())
 		if err != nil {
