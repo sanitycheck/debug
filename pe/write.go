@@ -102,7 +102,7 @@ func (peFile *File) Bytes() ([]byte, error) {
 	}
 
 	// write sections' data
-	for idx, sectionHeader := range sectionHeaders {
+	for idx, _ := range sectionHeaders {
 		section := peFile.Sections[idx]
 		sectionData, err := section.Data()
 		if err != nil {
@@ -120,13 +120,13 @@ func (peFile *File) Bytes() ([]byte, error) {
 		// if our shellcode insertion address is inside this section, insert it at the correct offset in sectionData
 		if peFile.InsertionAddr >= section.Offset && int64(peFile.InsertionAddr) <= (int64(section.Offset)+int64(section.Size)-int64(len(peFile.InsertionBytes))) {
 			sectionData = append(sectionData, peFile.InsertionBytes[:]...)
-			datalen := len(sectionData)
-			if sectionHeader.SizeOfRawData > uint32(datalen) {
-				paddingSize := sectionHeader.SizeOfRawData - uint32(datalen)
-				padding := make([]byte, paddingSize, paddingSize)
-				sectionData = append(sectionData, padding...)
-				//log.Printf("Padding after section %s: length:%d\n", section.Name, paddingSize)
-			}
+			/*			datalen := len(sectionData)
+						if sectionHeader.SizeOfRawData > uint32(datalen) {
+							paddingSize := sectionHeader.SizeOfRawData - uint32(datalen)
+							padding := make([]byte, paddingSize, paddingSize)
+							sectionData = append(sectionData, padding...)
+							//log.Printf("Padding after section %s: length:%d\n", section.Name, paddingSize)
+						}*/
 		}
 
 		binary.Write(peBuf, binary.LittleEndian, sectionData)
