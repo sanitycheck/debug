@@ -118,6 +118,9 @@ func (peFile *File) Bytes() ([]byte, error) {
 			if sectionHeader.SizeOfRawData > uint32(datalen) {
 				paddingSize := sectionHeader.SizeOfRawData - uint32(datalen)
 				padding := make([]byte, paddingSize, paddingSize)
+				for i := range padding {
+					padding[i] = 0x90
+				}
 				sectionData = append(sectionData, padding...)
 				//log.Printf("Padding after section %s: length:%d\n", section.Name, paddingSize)
 			}
