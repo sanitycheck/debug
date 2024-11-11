@@ -26,7 +26,7 @@ func (peFile *File) Bytes() ([]byte, error) {
 	}
 
 	// apply padding before PE header if necessary
-	if uint32(bytesWritten) <= peFile.DosHeader.AddressOfNewExeHeader {
+	if uint32(bytesWritten) != peFile.DosHeader.AddressOfNewExeHeader {
 		padding := make([]byte, peFile.DosHeader.AddressOfNewExeHeader-uint32(bytesWritten))
 		binary.Write(peBuf, binary.LittleEndian, padding)
 		bytesWritten += uint64(len(padding))
@@ -46,26 +46,20 @@ func (peFile *File) Bytes() ([]byte, error) {
 	switch peFile.FileHeader.Machine {
 	case IMAGE_FILE_MACHINE_I386:
 		is32bit = true
-		if peFile.OptionalHeader != nil {
-			optionalHeader := peFile.OptionalHeader.(*OptionalHeader32)
-			binary.Write(peBuf, binary.LittleEndian, peFile.OptionalHeader.(*OptionalHeader32))
-			bytesWritten += uint64(binary.Size(optionalHeader))
+		optionalHeader := peFile.OptionalHeader.(*OptionalHeader32)
+		binary.Write(peBuf, binary.LittleEndian, peFile.OptionalHeader.(*OptionalHeader32))
+		bytesWritten += uint64(binary.Size(optionalHeader))
 
-			oldCertTableOffset = optionalHeader.DataDirectory[CERTIFICATE_TABLE].VirtualAddress
-			oldCertTableSize = optionalHeader.DataDirectory[CERTIFICATE_TABLE].Size
-		}
-
+		oldCertTableOffset = optionalHeader.DataDirectory[CERTIFICATE_TABLE].VirtualAddress
+		oldCertTableSize = optionalHeader.DataDirectory[CERTIFICATE_TABLE].Size
 	case IMAGE_FILE_MACHINE_AMD64:
 		is32bit = false
-		if peFile.OptionalHeader != nil {
-			optionalHeader := peFile.OptionalHeader.(*OptionalHeader64)
-			binary.Write(peBuf, binary.LittleEndian, optionalHeader)
-			bytesWritten += uint64(binary.Size(optionalHeader))
+		optionalHeader := peFile.OptionalHeader.(*OptionalHeader64)
+		binary.Write(peBuf, binary.LittleEndian, optionalHeader)
+		bytesWritten += uint64(binary.Size(optionalHeader))
 
-			oldCertTableOffset = optionalHeader.DataDirectory[CERTIFICATE_TABLE].VirtualAddress
-			oldCertTableSize = optionalHeader.DataDirectory[CERTIFICATE_TABLE].Size
-		}
-
+		oldCertTableOffset = optionalHeader.DataDirectory[CERTIFICATE_TABLE].VirtualAddress
+		oldCertTableSize = optionalHeader.DataDirectory[CERTIFICATE_TABLE].Size
 	default:
 		return nil, errors.New("architecture not supported")
 	}
@@ -118,7 +112,7 @@ func (peFile *File) Bytes() ([]byte, error) {
 			bytesWritten += uint64(len(pad))
 		}
 		// if our shellcode insertion address is inside this section, insert it at the correct offset in sectionData
-		if peFile.InsertionAddr >= section.Offset && int64(peFile.InsertionAddr) <= (int64(section.Offset)+int64(section.Size)-int64(len(peFile.InsertionBytes))) {
+		if peFile.InsertionAddr >= section.Offset && int64(peFile.InsertionAddr) < (int64(section.Offset)+int64(section.Size)-int64(len(peFile.InsertionBytes))) {
 			sectionData = append(sectionData, peFile.InsertionBytes[:]...)
 			datalen := len(sectionData)
 			if sectionHeader.SizeOfRawData > uint32(datalen) {
@@ -134,10 +128,8 @@ func (peFile *File) Bytes() ([]byte, error) {
 	}
 
 	// write symbols
-	if len(peFile.COFFSymbols) > 0 && peFile.COFFSymbols[0].Value != 0 {
-		binary.Write(peBuf, binary.LittleEndian, peFile.COFFSymbols)
-		bytesWritten += uint64(binary.Size(peFile.COFFSymbols))
-	}
+	binary.Write(peBuf, binary.LittleEndian, peFile.COFFSymbols)
+	bytesWritten += uint64(binary.Size(peFile.COFFSymbols))
 
 	// write the string table
 	binary.Write(peBuf, binary.LittleEndian, peFile.StringTable)
