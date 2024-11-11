@@ -107,6 +107,9 @@ func (peFile *File) Bytes() ([]byte, error) {
 		}
 		if section.Offset != 0 && bytesWritten < uint64(section.Offset) {
 			pad := make([]byte, uint64(section.Offset)-bytesWritten)
+			for i := range pad {
+				pad[i] = 0x90
+			}
 			peBuf.Write(pad)
 			//log.Printf("Padding before section %s at %x: length:%x to:%x\n", section.Name, bytesWritten, len(pad), section.Offset)
 			bytesWritten += uint64(len(pad))
